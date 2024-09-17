@@ -1,6 +1,12 @@
 @R1
 A=M //get address if current element
 D=M //store value of current element
+
+@R2
+D=M
+@END
+D;JLE
+
 @R0
 M=D //store  first value in minimum
 
@@ -53,6 +59,3 @@ M=D //store  first value in minimum
 (END)
     @END
     0;JMP
-
-    
-
