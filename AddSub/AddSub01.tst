@@ -15,8 +15,8 @@ set RAM[3] 30000;  // Set R3
 repeat 100 {
   ticktock;    // Run for 100 clock cycles
 }
-set RAM[1] 32767, 
+set RAM[1] 30000, 
 set RAM[2] 1,  
-set RAM[3] 32767;
+set RAM[3] 30000;
 output;        // Output to file
 
