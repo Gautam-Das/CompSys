@@ -1,8 +1,3 @@
-// Finds the smallest element in the array of length R2 whose first element is at RAM[R1] and stores the result in R0.
-// (R0, R1, R2 refer to RAM[0], RAM[1], and RAM[2], respectively.)
-
-// Put your code here.
-//Check if array start far above R2
 @R1
 D=M
 @R2
@@ -10,7 +5,7 @@ D=M+D
 @16383
 D=A-D
 @END
-D;JLT
+D;JLT // end early if array exceeds address 16383
 
 
 @R1
@@ -19,22 +14,20 @@ D=M
 @END
 D=D-1
 D=D-1
-D;JLE
+D;JLE // end early if array starts at or before address 2
 
-//get current tempMin
+
+// set min
 @R1
 A=M
 D=M
-
 @R0
-M=D
+M=D 
 
-//Check that length of array is sufficient
 @R2
 D=M
-
 @END
-D;JLE
+D;JLE // end if length < 0
 
 
 
