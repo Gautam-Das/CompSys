@@ -16,6 +16,10 @@ D=D-1
 D=D-1
 D;JLE // end early if array starts at or before address 2
 
+@R2
+D=M
+@END
+D;JLE // end if length < 0
 
 // set min
 @R1
@@ -23,11 +27,6 @@ A=M
 D=M
 @R0
 M=D 
-
-@R2
-D=M
-@END
-D;JLE // end if length < 0
 
 
 
