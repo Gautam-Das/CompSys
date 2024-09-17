@@ -1,65 +1,61 @@
-// ArrMin.asm
-// This program finds the smallest value in a given array and stores it in R0
-
-// Initialize pointers
 @R1
-D=M        // D = address of the first element of the array (R1)
-@addr      // Store the base address of the array in addr
-M=D
+A=M //get address if current element
+D=M //store value of current element
 
 @R2
-D=M        // D = length of the array (R2)
-@length
-M=D        // Store the length in memory
+D=M
+@END
+D;JLE
 
-// Set the initial minimum value to the first element of the array
-@addr
-A=M        // A = address of the first element
-D=M        // D = *addr (value of the first element)
 @R0
-M=D        // Set R0 = initial minimum
+M=D //store  first value in minimum
 
-// Start the loop
-@i
-M=1        // i = 1 (since we already took the first element)
-
-(LOOP)
-    @i
-    D=M    // D = i (current index)
-    @length
-    D=D-M  // D = i - length
+(WHILE)
+    // check if R2 = 0
+    @R2
+    D=M
     @END
-    D;JGE  // If i >= length, go to END
+    D;JEQ
+    
+    // Decrement  R2
+    @R2
+    M=M-1
 
-    // Compare current element with the minimum
-    @addr
-    D=M    // D = base address of array
-    @i
-    D=D+M  // D = addr + i (current element address)
-    A=D    // A = RAM[addr + i]
-    D=M    // D = RAM[addr + i] (current element)
+    // Get curretn element
+    @R1 
+    A=M
+    D=M
+
+    // find difference between current minimum and new minimum
     @R0
-    D=D-M  // D = current element - R0 (current min)
-    @SKIP
-    D;JGE  // If current element >= min, skip to SKIP
+    D=M-D
+    
+    // jump if M-D>0 i.e. M>D
+    @minimum
+    D;JGT
+    
+    @continue
+    0;JMP
 
-    // Update min if the current element is smaller
-    @addr
-    D=M    // D = base address
-    @i
-    D=D+M  // D = addr + i
-    A=D    // A = RAM[addr + i]
-    D=M    // D = current element
-    @R0
-    M=D    // R0 = current element (new min)
 
-(SKIP)
-    // Increment i and repeat
-    @i
-    M=M+1
-    @LOOP
-    0;JMP  // Go back to LOOP
+    (minimum)
+        // Get current element
+        @R1 
+        A=M
+        D=M
+        //  change  minimum
+        @R0
+        M=D
+        @continue 
+        0;JMP
+
+    (continue)
+        // increase memory address
+        @R1
+        M=M+1
+        @WHILE  
+        0;JMP
 
 (END)
     @END
-    0;JMP  // Infinite loop at the end
+    0;JMP
