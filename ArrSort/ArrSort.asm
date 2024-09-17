@@ -115,7 +115,7 @@ M=0
     A=D+M
     D=M // D= J-1
     A=A+1 // A POINTS TO J
-    D=D-A // (J-1)-J
+    D=D-M // (J-1)-J
     @SWAP
     D;JGT
     @CONTINUE
