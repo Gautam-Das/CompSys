@@ -25,10 +25,11 @@ M=D
     @R1
     D=M
     @R0
-    M=D+M
+    M=M+D
 
     @R3
-    DM=M-1
+    M=M-1
+    D=M
     @WHILE
     D;JGT
 
