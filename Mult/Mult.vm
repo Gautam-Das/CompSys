@@ -2,129 +2,74 @@
 // a is a local variable
 // x & y are static variables
 
-// Put your code here.
-push constant 0
-pop local 0
-
-push static 0
-push constant 0
-eq
-if-goto END
-
-push static 1
-push constant 0
-eq
-if-goto END
-
-
-// abs(X)
+// Calculate abs(x)
 push static 0
 push constant 0
 gt
-if-goto xPos
+if-goto XgreaterThan
 push static 0
 neg
-pop static 3
+pop temp 0
+goto y
 
-goto xcont
-
-label xPos
+label XgreaterThan
 push static 0
-pop static 3
+pop temp 0
 
-label xcont
-
-
-// abs(Y)
+label y
+// Calculate abs(y)
 push static 1
 push constant 0
 gt
-if-goto yPos
+if-goto YgreaterThan
 push static 1
 neg
-pop static 4
+pop temp 1
+goto setup
 
-goto ycont
-
-label yPos
+label YgreaterThan
 push static 1
-pop static 4
+pop temp 1
 
-label ycont
+label setup
+push constant 0
+pop temp 2  // temp 2 will hold the result
 
-// multiply
-push static 3
-push static 4
-gt
-if-goto xGTy
-// x is less than y
-push static 3
-pop static 2
+label mult
+push temp 0
+push constant 0
+eq  // check if x == 0
+if-goto final
 
-label aLoop
-push static 4
-push local 0
+push temp 2
+push temp 1
 add
-pop local 0
+pop temp 2
 
-push static 2
+push temp 0
 push constant 1
 sub
-pop static 2
+pop temp 0
+goto mult
 
-push static 2
-push constant 0
-gt
-if-goto aLoop
-goto checkNeg
-
-// x is greater than y
-label xGTy
-push static 4
-pop static 2
-
-label bLoop
-push static 3
-push local 0
-add
-pop local 0
-
-push static 2
-push constant 1
-sub
-pop static 2
-
-push static 2
-push constant 0
-gt
-if-goto bLoop
-
-
-
-
-
-
-
-// check if x and y are negative
-label checkNeg
+label final
+// Now handle the signs
 push static 0
-push constant 0
-gt
-if-goto skip1
-push local 0
-neg
-pop local 0
-
-label skip1
 push static 1
+xor  // if signs of x and y differ, result should be negative
 push constant 0
-gt
-if-goto skip2
-push local 0
+eq
+if-goto posResult
+
+// Negate result
+push temp 2
 neg
 pop local 0
+goto END
 
-label skip2
+label posResult
+push temp 2
+pop local 0
 
 label END
 goto END
