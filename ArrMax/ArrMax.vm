@@ -8,7 +8,7 @@ function ArrMax.arrMax 2
     push argument 1
     push constant 1 
     lt   
-    if-goto invalidLength
+    if-goto retFalse
 
     // Initialize counter to 0
     push constant 0
@@ -63,6 +63,6 @@ function ArrMax.arrMax 2
         push temp 1
         return
 
-    label invalidLength
+    label retFalse
         push constant 0
         return
