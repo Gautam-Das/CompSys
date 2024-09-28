@@ -55,12 +55,26 @@ goto mult
 label final
 // Now handle the signs
 push static 0
-push static 1
-xor  // if signs of x and y differ, result should be negative
 push constant 0
-eq
-if-goto posResult
+gt
+if-goto xpos
 
+// xneg
+push static 1
+push constant 0
+gt
+if-goto negResult
+goto posResult
+
+label xpos
+push static 1
+push constant 0
+gt
+if-goto posResult
+goto negResult
+
+
+label negResult
 // Negate result
 push temp 2
 neg
