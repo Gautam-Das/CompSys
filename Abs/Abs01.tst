@@ -1,7 +1,7 @@
 // test 1: negative number
 load Abs.vm,
 output-file Abs00.out,
-compare-to Abs00.cmp,
+compare-to Abs01.cmp,
 output-list RAM[16]%D1.6.1 RAM[17]%D1.6.1 RAM[18]%D1.6.1 local[0]%D1.8.1 local[1]%D1.8.1 local[2]%D1.8.1 argument[0]%D1.11.1 argument[1]%D1.11.1 argument[2]%D1.11.1;
 
 set sp 256,        // stack pointer
