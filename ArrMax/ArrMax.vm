@@ -8,7 +8,7 @@ function ArrMax.arrMax 2
     push argument 1
     push constant 1 
     lt   
-    if-goto il
+    if-goto ArrMax.arrMax$il
 
     // Initialize counter to 0
     push constant 0
@@ -22,7 +22,7 @@ function ArrMax.arrMax 2
     push that 0
     pop temp 1
 
-    label loop
+    label ArrMax.arrMax$loop
         // Increment counter
         push temp 0
         push constant 1
@@ -33,7 +33,7 @@ function ArrMax.arrMax 2
         push argument 1
         push temp 0
         eq
-        if-goto loopEnd
+        if-goto ArrMax.arrMax$loopEnd
 
         // increase that
         push argument 0
@@ -49,20 +49,20 @@ function ArrMax.arrMax 2
         push temp 2
         push temp 1
         gt
-        if-goto newMax
-        goto loop
+        if-goto ArrMax.arrMax$newMax
+        goto ArrMax.arrMax$loop
 
-    label newMax
+    label ArrMax.arrMax$newMax
         // change max
         push temp 2
         pop temp 1
-        goto loop
+        goto ArrMax.arrMax$loop
 
-    label loopEnd
+    label ArrMax.arrMax$loopEnd
         // return
         push temp 1
         return
 
-    label il
+    label ArrMax.arrMax$il
         push constant 0
         return
