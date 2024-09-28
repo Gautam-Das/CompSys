@@ -1,68 +1,68 @@
-// Function to find the largest element in an array
-// Function signature: ArrMax.arrMax(a, b)
-// a: starting address of the array (argument 0)
-// b: length of the array (argument 1)
+// Contains a function ArrMax.arrMax that finds and returns the largest element in the array a of length b.
+// a & b are both supplied as arguments
 
+// Put your code here.
 function ArrMax.arrMax 2
-    // Check if the array length is less than or equal to 0
-    push argument 1
-    push constant 1 
-    lt   
-    if-goto InvalidLength
+// if size less than or equal to 0
+push argument 1
+push constant 1
+lt
+if-goto retFalse
 
-    // Initialize counter to 0
-    push constant 0
-    pop temp 0
+//normal case
 
-    // Set pointer to the start
-    push argument 0
-    pop pointer 1
+// loop counter
+push constant 0
+pop temp 0
 
-    // first element is current max
-    push that 0
-    pop temp 1
+//get pointer
+push argument 0
+pop pointer 1 
 
-    label loop
-        // Increment counter
-        push temp 0
-        push constant 1
-        add
-        pop temp 0
+//store best value in temp 1
+push that 0
+pop temp 1
 
-        // if counter == n
-        push argument 1
-        push temp 0
-        eq
-        if-goto loopEnd
+label loop
+//loop exit
+push temp 0
+push constant 1
+add
+pop temp 0
 
-        // increase that
-        push argument 0
-        push temp 0
-        add
-        pop pointer 1
+push argument 1
+push temp 0
+eq
+if-goto loopEnd
 
-        // get current element
-        push that 0
-        pop temp 2
+push argument 0
+push temp 0
+add
+pop pointer 1
 
-        // check if current element is greater than current max
-        push temp 2
-        push temp 1
-        gt
-        if-goto newMax
-        goto loop
+push that 0
+//store current value
+pop temp 2
 
-    label newMax
-        // change max
-        push temp 2
-        pop temp 1
-        goto loop
+push temp 2
+push temp 1
+gt
+if-goto newVal
+goto loop
 
-    label loopEnd
-        // return
-        push temp 1
-        return
+label newVal
+push temp 2
+pop temp 1
+goto loop
 
-    label InvalidLength
-        push constant 0
-        return
+label loopEnd
+
+push temp 1
+return
+
+label retFalse
+push constant 0
+return
+
+
+
