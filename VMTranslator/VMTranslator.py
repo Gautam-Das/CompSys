@@ -1,72 +1,363 @@
+def segmentReformatter(seg, idx):
+    if (seg == "this"):
+        return "THIS"
+
+    if (seg == "that"):
+        return "THAT"
+
+    if (seg == "argument"):
+        return "ARG"
+    
+    if (seg == "local"):
+        return "LCL"
+    
+    if (seg == "static"):
+        return str(16 + idx)
+
+    if (seg == "pointer"):
+        return "R" + str(3 + idx)
+
+    if (seg == "temp"):
+        return "R" + str(5 + idx)
+
+    if (seg == "constant"):
+        return str(idx)
+    
+    return seg
+
 class VMTranslator:
+    labelCount = 0
+    
+    def newUniqueLabel():
+        uniqueLabel = str(VMTranslator.labelCount)
+        VMTranslator.labelCount += 1
+        return uniqueLabel
 
-    def vm_push(segment, offset):
+    def vm_push(seg, idx):
         '''Generate Hack Assembly code for a VM push operation'''
-        return "" 
+        resolvedSeg = segmentReformatter(seg, idx)
+        resultCode = ""
+        if (seg == "constant" or seg == "static" or seg == "pointer" or seg == "temp"):
+            resultCode += "@" + resolvedSeg + "\n"
+            if seg == "constant":
+                resultCode += "D = A\n"
+            else:
+                resultCode += "D = M\n"
+        elif (seg == "local" or seg == "this" or seg == "that" or seg == "argument"):
+            resultCode += "@" + resolvedSeg + "\n"
+            resultCode += "D = M\n"
+            resultCode += "@" + str(idx) + "\n"
+            resultCode += "A = D + A\n"
+            resultCode += "D=M\n"
+        
+        resultCode += "@SP\n"
+        resultCode += "A=M\n"
+        resultCode += "M=D\n"
+        resultCode += "@SP\n"
+        resultCode += "M = M+1"
 
-    def vm_pop(segment, offset):
+        return resultCode
+
+    def vm_pop(seg, idx):
         '''Generate Hack Assembly code for a VM pop operation'''
-        return ""
+        resolvedSeg = segmentReformatter(seg, idx)
+        resultCode = "@" + resolvedSeg + "\n"
+        
+        if (seg == "static" or seg == "temp" or seg == "pointer"):
+            resultCode += "D = A\n"
+        elif (seg == "local" or seg == "this" or seg == "that" or seg == "argument"):
+            resultCode += "D = M\n"
+            resultCode += "@" + str(idx) + "\n"
+            resultCode += "D = D + A\n"
+
+        resultCode += "@R13\n"
+        resultCode += "M = D\n"
+        resultCode += "@SP\n"
+        resultCode += "AM = M -1\n"
+        resultCode += "D=M\n"
+        resultCode += "@R13\n"
+        resultCode += "A=M\n"
+        resultCode += "M=D"
+
+        return resultCode
 
     def vm_add():
         '''Generate Hack Assembly code for a VM add operation'''
-        return ""
+        resultCode = "@SP\n"
+        resultCode += "AM = M-1\n"
+        resultCode += "D = M\n"
+        resultCode += "A = A-1\n"
+        resultCode += "M = D + M"
+
+        return resultCode
 
     def vm_sub():
         '''Generate Hack Assembly code for a VM sub operation'''
-        return ""
+        resultCode = "@SP\n"
+        resultCode += "AM = M-1\n"
+        resultCode += "D = M\n"
+        resultCode += "A = A-1\n"
+        resultCode += "M = M - D"
+
+        return resultCode
 
     def vm_neg():
         '''Generate Hack Assembly code for a VM neg operation'''
-        return ""
+        resultCode = "@SP\n"
+        resultCode += "A = M-1\n"
+        resultCode += "M = !M\n"
+        resultCode += "M = M + 1"
+
+        return resultCode
 
     def vm_eq():
         '''Generate Hack Assembly code for a VM eq operation'''
-        return ""
+        uniqueLabel = VMTranslator.newUniqueLabel()
+
+        resultCode = "@SP\n"
+        resultCode += "AM = M-1\n"
+        resultCode += "D = M\n"
+        resultCode += "A = A-1\n"
+        resultCode += "D = M - D\n"
+        resultCode += "@EQ.true_" + uniqueLabel + "\n"
+        resultCode += "D;JEQ\n"
+        resultCode += "@SP\n"
+        resultCode += "A = M-1\n"
+        resultCode += "M = 0\n"
+        resultCode += "@EQ.skip_" + uniqueLabel + "\n"
+        resultCode += "0;JMP\n"
+        resultCode += "(EQ.true_" + uniqueLabel + ")\n"
+        resultCode += "@SP\n"
+        resultCode += "A = M-1\n"
+        resultCode += "M = -1\n"
+        resultCode += "(EQ.skip_" + uniqueLabel + ")"
+        return resultCode
 
     def vm_gt():
         '''Generate Hack Assembly code for a VM gt operation'''
-        return ""
+        uniqueLabel = VMTranslator.newUniqueLabel()
+        resultCode = "@SP\n"
+        resultCode += "AM = M-1\n"
+        resultCode += "D = M\n"
+        resultCode += "A = A-1\n"
+        resultCode += "D = M - D\n"
+        resultCode += "@GT.true" + uniqueLabel + "\n"
+        resultCode += "D;JGT\n"
+        resultCode += "@SP\n"
+        resultCode += "A = M-1\n"
+        resultCode += "M = 0\n"
+        resultCode += "@GT.skip" + uniqueLabel + "\n"
+        resultCode += "0;JMP\n"
+        resultCode += "(GT.true" + uniqueLabel + ")\n"
+        resultCode += "@SP\n"
+        resultCode += "A = M-1\n"
+        resultCode += "M = -1\n"
+        resultCode += "(GT.skip" + uniqueLabel + ")"
+        return resultCode
 
     def vm_lt():
         '''Generate Hack Assembly code for a VM lt operation'''
-        return ""
+        uniqueLabel = VMTranslator.newUniqueLabel()
+        resultCode = "@SP\n"
+        resultCode += "AM = M-1\n"
+        resultCode += "D = M\n"
+        resultCode += "A = A-1\n"
+        resultCode += "D = M - D\n"
+        resultCode += "@LT.true" + uniqueLabel + "\n"
+        resultCode += "D;JLT\n"
+        resultCode += "@SP\n"
+        resultCode += "A = M-1\n"
+        resultCode += "M = 0\n"
+        resultCode += "@LT.skip" + uniqueLabel + "\n"
+        resultCode += "0;JMP\n"
+        resultCode += "(LT.true" + uniqueLabel + ")\n"
+        resultCode += "@SP\n"
+        resultCode += "A = M-1\n"
+        resultCode += "M = -1\n"
+        resultCode += "(LT.skip" + uniqueLabel + ")"
+        return resultCode
 
     def vm_and():
         '''Generate Hack Assembly code for a VM and operation'''
-        return ""
+        resultCode = "@SP\n"
+        resultCode += "AM = M-1\n"
+        resultCode += "D = M\n"
+        resultCode += "A = A-1\n"
+        resultCode += "M = M&D"
+        return resultCode
 
     def vm_or():
         '''Generate Hack Assembly code for a VM or operation'''
-        return ""
+        resultCode = "@SP\n"
+        resultCode += "AM = M-1\n"
+        resultCode += "D = M\n"
+        resultCode += "A = A-1\n"
+        resultCode += "M = M|D"
+        return resultCode
 
     def vm_not():
         '''Generate Hack Assembly code for a VM not operation'''
-        return ""
+        resultCode = "@SP\n"
+        resultCode += "A = M-1\n"
+        resultCode += "M = !M"
+        return resultCode
 
-    def vm_label(label):
+    def vm_label(lbl):
         '''Generate Hack Assembly code for a VM label operation'''
-        return ""
+        resultCode = "(" + lbl + ")"
+        return resultCode
 
-    def vm_goto(label):
+    def vm_goto(lbl):
         '''Generate Hack Assembly code for a VM goto operation'''
-        return ""
+        resultCode = "@" + lbl + "\n"
+        resultCode += "0;JMP"
+        return resultCode
 
-    def vm_if(label):
+    def vm_if(lbl):
         '''Generate Hack Assembly code for a VM if-goto operation'''
-        return ""
+        resultCode = "@SP\n"
+        resultCode += "AM = M-1\n"
+        resultCode += "D = M\n"
+        resultCode += "@" + lbl + "\n"
+        resultCode += "D;JNE"
 
-    def vm_function(function_name, n_vars):
+        return resultCode
+
+    def vm_function(funcName, numVars):
         '''Generate Hack Assembly code for a VM function operation'''
-        return ""
+        resultCode = "(FUNC.defMod." + funcName + ")\n"
+        resultCode += "@SP\n"
+        resultCode += "A = M\n"
+        for i in range(numVars):
+            resultCode += "M=0\n"
+            resultCode += "A=A+1\n"
+        resultCode += "D=A\n"
+        resultCode += "@SP\n"
+        resultCode += "M=D"
 
-    def vm_call(function_name, n_args):
+        return resultCode
+
+    def vm_call(funcName, numArgs):
         '''Generate Hack Assembly code for a VM call operation'''
-        return ""
+        uniqueLabel = VMTranslator.newUniqueLabel()
+
+        resultCode = "@SP\n"
+        resultCode += "D=M\n"
+        resultCode += "@R13\n"
+        resultCode += "M=D\n"
+        
+        resultCode += "@RET." + uniqueLabel + "\n"
+        resultCode += "D=A\n"
+        resultCode += "@SP\n"
+        resultCode += "A=M\n"
+        resultCode += "M=D\n"
+
+        resultCode += "@SP\n"
+        resultCode += "M=M+1\n"
+
+        resultCode += "@LCL\n"
+        resultCode += "D=M\n"
+        resultCode += "@SP\n"
+        resultCode += "A=M\n"
+        resultCode += "M=D\n"
+
+        resultCode += "@SP\n"
+        resultCode += "M=M+1\n"
+
+        resultCode += "@ARG\n"
+        resultCode += "D=M\n"
+        resultCode += "@SP\n"
+        resultCode += "A=M\n"
+        resultCode += "M=D\n"
+        
+        resultCode += "@SP\n"
+        resultCode += "M=M+1\n"
+
+        resultCode += "@THIS\n"
+        resultCode += "D=M\n"
+        resultCode += "@SP\n"
+        resultCode += "A=M\n"
+        resultCode += "M=D\n"
+
+        resultCode += "@SP\n"
+        resultCode += "M=M+1\n"
+
+        resultCode += "@THAT\n"
+        resultCode += "D=M\n"
+        resultCode += "@SP\n"
+        resultCode += "A=M\n"
+        resultCode += "M=D\n"
+
+        resultCode += "@SP\n"
+        resultCode += "M=M+1\n"
+
+        resultCode += "@R13\n"
+        resultCode += "D=M\n"
+        resultCode += "@" + str(numArgs) + "\n"
+        resultCode += "D=D-A\n"
+        resultCode += "@ARG\n"
+        resultCode += "M=D\n"
+
+        resultCode += "@SP\n"
+        resultCode += "D=M\n"
+        resultCode += "@LCL\n"
+        resultCode += "M=D\n"
+        resultCode += "@FUNC.defMod." + funcName + "\n"
+        resultCode += "0;JMP\n"
+        resultCode += "(RET." + uniqueLabel + ")"
+
+        return resultCode
 
     def vm_return():
         '''Generate Hack Assembly code for a VM return operation'''
-        return ""
+        resultCode = "@LCL\n"
+        resultCode += "D=M\n"
+        resultCode += "@5\n"
+        resultCode += "A=D-A\n"
+        resultCode += "D=M\n"
+        resultCode += "@R13\n"
+        resultCode += "M=D\n"
+
+        resultCode += "@SP\n"
+        resultCode += "A=M-1\n"
+        resultCode += "D=M\n"
+        resultCode += "@ARG\n"
+        resultCode += "A=M\n"
+        resultCode += "M=D\n"
+
+        resultCode += "D=A+1\n"
+        resultCode += "@SP\n"
+        resultCode += "M=D\n"
+
+        resultCode += "@LCL\n"
+        resultCode += "AM=M-1\n"
+        resultCode += "D=M\n"
+        resultCode += "@THAT\n"
+        resultCode += "M=D\n"
+
+        resultCode += "@LCL\n"
+        resultCode += "AM=M-1\n"
+        resultCode += "D=M\n"
+        resultCode += "@THIS\n"
+        resultCode += "M=D\n"
+
+        resultCode += "@LCL\n"
+        resultCode += "AM=M-1\n"
+        resultCode += "D=M\n"
+        resultCode += "@ARG\n"
+        resultCode += "M=D\n"
+
+        resultCode += "@LCL\n"
+        resultCode += "A=M-1\n"
+        resultCode += "D=M\n"
+        resultCode += "@LCL\n"
+        resultCode += "M=D\n"
+
+        resultCode += "@R13\n"
+        resultCode += "A=M\n"
+        resultCode += "0;JMP"
+
+        return resultCode
 
 # A quick-and-dirty parser when run as a standalone script.
 if __name__ == "__main__":
