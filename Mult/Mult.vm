@@ -3,96 +3,128 @@
 // x & y are static variables
 
 // Put your code here.
+push constant 0
+pop local 0
 
-//abs(x)
+push static 0
+push constant 0
+eq
+if-goto END
+
+push static 1
+push constant 0
+eq
+if-goto END
+
+
+// abs(X)
 push static 0
 push constant 0
 gt
-if-goto XgreaterThan
+if-goto xPos
 push static 0
 neg
-pop temp 0
+pop static 3
 
-goto y
+goto xcont
 
-label XgreaterThan
+label xPos
 push static 0
-pop temp 1
+pop static 3
 
-label y
-//abs(y)
+label xcont
+
+
+// abs(Y)
 push static 1
 push constant 0
 gt
-if-goto YgreaterThan
+if-goto yPos
 push static 1
 neg
-pop temp 1
-goto setup
+pop static 4
 
-label YgreaterThan
+goto ycont
+
+label yPos
 push static 1
-pop temp 1
+pop static 4
 
-label setup
-push constant 0
-pop temp 2
+label ycont
 
-label mult
-push temp 0
-push constant 1
-// if x < 1, done 
-lt
-if-goto final
+// multiply
+push static 3
+push static 4
+gt
+if-goto xGTy
+// x is less than y
+push static 3
+pop static 2
 
-push temp 2
-push temp 1
+label aLoop
+push static 4
+push local 0
 add
-pop temp 2
+pop local 0
 
-push temp 0
+push static 2
 push constant 1
 sub
-pop temp 0
-goto mult
+pop static 2
 
-label final
-//if xpos
+push static 2
+push constant 0
+gt
+if-goto aLoop
+goto checkNeg
+
+// x is greater than y
+label xGTy
+push static 4
+pop static 2
+
+label bLoop
+push static 3
+push local 0
+add
+pop local 0
+
+push static 2
+push constant 1
+sub
+pop static 2
+
+push static 2
+push constant 0
+gt
+if-goto bLoop
+
+
+
+
+
+
+
+// check if x and y are negative
+label checkNeg
 push static 0
 push constant 0
 gt
-if-goto xpos
-
-label xneg
-// if ypos
-push static 1
-push constant 0
-gt
-if-goto negans
-goto posans
-
-
-label xpos
-// if ypos
-push static 1
-push constant 0
-gt
-if-goto posans
-goto negans
-
-
-label posans
-push temp 2
-pop local 2
-goto END
-
-label negans
-push temp 2
+if-goto skip1
+push local 0
 neg
 pop local 0
-goto END
 
+label skip1
+push static 1
+push constant 0
+gt
+if-goto skip2
+push local 0
+neg
+pop local 0
 
+label skip2
 
 label END
 goto END
