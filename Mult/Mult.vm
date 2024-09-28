@@ -1,0 +1,98 @@
+// Calculates a = x*y
+// a is a local variable
+// x & y are static variables
+
+// Put your code here.
+
+//abs(x)
+push static 0
+push constant 0
+gt
+if-goto XgreaterThan
+push static 0
+neg
+pop temp 0
+
+goto y
+
+label XgreaterThan
+push static 0
+pop temp 1
+
+label y
+//abs(y)
+push static 1
+push constant 0
+gt
+if-goto YgreaterThan
+push static 1
+neg
+pop temp 1
+goto setup
+
+label YgreaterThan
+push static 1
+pop temp 1
+
+label setup
+push constant 0
+pop temp 2
+
+label mult
+push temp 0
+push constant 1
+// if x < 1, done 
+lt
+if-goto final
+
+push temp 2
+push temp 1
+add
+pop temp 2
+
+push temp 0
+push constant 1
+sub
+pop temp 0
+goto mult
+
+label final
+//if xpos
+push static 0
+push constant 0
+gt
+if-goto xpos
+
+label xneg
+// if ypos
+push static 1
+push constant 0
+gt
+if-goto negans
+goto posans
+
+
+label xpos
+// if ypos
+push static 1
+push constant 0
+gt
+if-goto posans
+goto negans
+
+
+label posans
+push temp 2
+pop local 2
+goto END
+
+label negans
+push temp 2
+neg
+pop local 0
+goto END
+
+
+
+label END
+goto END

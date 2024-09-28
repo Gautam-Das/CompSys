@@ -1,0 +1,22 @@
+// Calculates x = (a + b) - x
+// a & b are local variables
+// x is a static variable
+
+// Put your code here.
+push static 0
+push constant 0
+lt
+if-goto lessthan
+push static 0
+pop static 1
+goto END
+
+label lessthan
+push static 0
+neg
+pop static 1
+
+
+
+label END
+goto END

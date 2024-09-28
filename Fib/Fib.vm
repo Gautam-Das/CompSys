@@ -1,0 +1,19 @@
+function Fib.fib 0
+push argument 0
+push constant 1
+gt
+if-goto recursive
+push argument 0
+return
+
+label recursive
+push argument 0
+push constant 2
+sub
+call Fib.fib 1
+push argument 0
+push constant 1
+sub
+call Fib.fib 1
+add
+return
