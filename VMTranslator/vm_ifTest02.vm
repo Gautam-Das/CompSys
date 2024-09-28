@@ -1,0 +1,11 @@
+push constant 1
+push constant 1
+eq
+if-goto end
+
+label notend
+push constant 100
+
+label end
+goto end
+

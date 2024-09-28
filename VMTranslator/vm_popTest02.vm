@@ -1,0 +1,4 @@
+push constant 1
+pop this 0
+push constant 2
+pop local 0

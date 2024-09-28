@@ -1,0 +1,4 @@
+function vm_functionTest01.foo 0
+     push constant 1
+     pop static 0
+     return

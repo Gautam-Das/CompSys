@@ -1,0 +1,11 @@
+call vm_returnTest01.foo 0
+pop static 0
+
+label end
+goto end
+
+
+function vm_returnTest01.foo 0
+push constant 1
+return
+

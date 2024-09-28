@@ -1,0 +1,6 @@
+function vm_functionTest02.foo 0
+     push constant 1
+     push constant 1
+     eq
+     pop static 0
+     return

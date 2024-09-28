@@ -1,0 +1,14 @@
+call vm_CallTest01.foo
+call vm_CallTest01.back
+label end
+goto end
+
+
+
+
+
+function vm_CallTest01.foo 0
+    return
+
+function vm_callTest02.back 0
+    return

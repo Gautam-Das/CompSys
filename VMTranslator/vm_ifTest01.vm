@@ -1,0 +1,11 @@
+push constant 1
+push constant 2
+lt
+if-goto test
+
+label end
+goto end
+
+label test
+push constant 1
+goto end

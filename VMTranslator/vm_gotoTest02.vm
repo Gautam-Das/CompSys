@@ -1,0 +1,9 @@
+push constant 1
+goto skip
+goto end
+
+label skip
+push constant 2
+
+label end
+goto end
