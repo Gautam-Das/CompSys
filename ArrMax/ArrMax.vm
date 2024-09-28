@@ -8,7 +8,7 @@ function ArrMax.arrMax 2
     push argument 1
     push constant 1 
     lt   
-    if-goto retFalse
+    if-goto il
 
     // Initialize counter to 0
     push constant 0
@@ -63,6 +63,6 @@ function ArrMax.arrMax 2
         push temp 1
         return
 
-    label retFalse
+    label il
         push constant 0
         return
