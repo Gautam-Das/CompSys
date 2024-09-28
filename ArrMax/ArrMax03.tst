@@ -2,7 +2,7 @@
 
 load,
 output-file ArrMax00.out,
-compare-to ArrMax02.cmp,
+compare-to ArrMax03.cmp,
 output-list 
             RAM[16]%D1.6.1 RAM[17]%D1.6.1 RAM[18]%D1.6.1
             local[0]%D1.8.1 local[1]%D1.8.1 local[2]%D1.8.1
