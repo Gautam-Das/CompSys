@@ -1,68 +1,69 @@
-// Function to find the largest element in an array
-// Function signature: ArrMax.arrMax(a, b)
-// a: starting address of the array (argument 0)
-// b: length of the array (argument 1)
+// Contains a function ArrMax.arrMax that finds and returns the largest element in the array a of length b.
+// a & b are both supplied as arguments
 
 function ArrMax.arrMax 2
-    // Check if the array length is less than or equal to 0
-    push argument 1
-    push constant 1 
-    lt   
-    if-goto retFalse
+// Check if the array length is less than or equal to 0
+push argument 1
+push constant 1
+lt
+if-goto retFalse
 
-    // Initialize counter to 0
-    push constant 0
-    pop temp 0
+// Initialize counter to 0
+push constant 0
+pop temp 0
 
-    // Set pointer to the start
-    push argument 0
-    pop pointer 1
+// Set pointer to the start
+push argument 0
+pop pointer 1 
 
-    // first element is current max
-    push that 0
-    pop temp 1
+// first element is current max
+push that 0
+pop temp 1
 
-    label loop
-        // Increment counter
-        push temp 0
-        push constant 1
-        add
-        pop temp 0
+label loop
+// Increment counter
+push temp 0
+push constant 1
+add
+pop temp 0
 
-        // if counter == n
-        push argument 1
-        push temp 0
-        eq
-        if-goto loopEnd
+// if counter == n
+push argument 1
+push temp 0
+eq
+if-goto loopEnd
 
-        // increase that
-        push argument 0
-        push temp 0
-        add
-        pop pointer 1
+// increase that
+push argument 0
+push temp 0
+add
+pop pointer 1
 
-        // get current element
-        push that 0
-        pop temp 2
+// get current element
+push that 0
+pop temp 2
 
-        // check if current element is greater than current max
-        push temp 2
-        push temp 1
-        gt
-        if-goto newMax
-        goto loop
+// check if current element is greater than current max
+push temp 2
+push temp 1
+gt
+if-goto newVal
+goto loop
 
-    label newMax
-        // change max
-        push temp 2
-        pop temp 1
-        goto loop
+label newVal
+// change max
+push temp 2
+pop temp 1
+goto loop
 
-    label loopEnd
-        // return
-        push temp 1
-        return
+label loopEnd
+// return
+push temp 1
+return
 
-    label retFalse
-        push constant 0
-        return
+label retFalse
+push constant 0
+return
+
+
+
