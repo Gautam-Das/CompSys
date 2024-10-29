@@ -60,7 +60,41 @@ class CompilerParser :
         Generates a parse tree for a single class
         @return a ParseTree that represents a class
         """
-        return None 
+        # init tree if keyword is class
+        if not self.have("keyword", "class"): raise ParseException("Expected Keyword - class")
+        tree = ParseTree("class", "")
+        tree.addChild(ParseTree("keyword", "class"))
+        self.next()
+
+        # identifier
+        if not self.current_token.type == "identifier": raise ParseException("expected Identifier")
+        tree.addChild(ParseTree("identifier", self.current_token.value))
+        self.next()
+
+        # {
+        if not self.have("symbol", "{"): raise ParseException("expected {")
+        tree.addChild(ParseTree("symbol", "{"))
+        self.next()
+
+        # class variables
+        while not self.have("symbol", "}"):
+            if self.current_token.value in ["static" , "field"]:
+                tree.addChild(self.compileClassVarDec())
+                self.next()
+
+            elif self.current_token.value in ["constructor" , "function", "method"]:
+                tree.addChild(self.compileSubroutine())
+                self.next()
+            
+            else:
+                raise ParseException("current token is not a variable decleration or a subroutine")
+        
+        # }
+        if not self.have("symbol", "}"): raise ParseException("expected }")
+        tree.addChild(ParseTree("symbol", "}"))
+        self.next()
+
+        return tree
     
 
     def compileClassVarDec(self):
@@ -68,7 +102,52 @@ class CompilerParser :
         Generates a parse tree for a static variable declaration or field declaration
         @return a ParseTree that represents a static variable declaration or field declaration
         """
-        return None 
+
+        tree = ParseTree("classVarDec","")
+        if not (self.have("keyword", "static") or self.have("keyword", "field")): raise ParseException("expected keyword to be field or static")
+    
+        # static_or_field = self.current_token.type
+
+        tree.addChild(ParseTree(self.current_token.type, self.current_token.value))
+        self.next()
+
+        # must be primitive or class data type
+        if self.current_token.type != "identifier" and not (self.current_token.type == "keyword" and self.current_token.value in ["int", "char", "boolean"]): raise ParseException("Expected token type to be an int, char, boolean or identifier")
+        # variable_token_type = self.current_token.type
+        # variable_token_value = self.current_token.value
+        tree.addChild(ParseTree(self.current_token.type, self.current_token.value))
+        self.next()
+        
+        #variable name
+        if self.current_token.type != "identifier": raise ParseException("Expected token type to be an identifier")
+        tree.addChild(ParseTree("identifier", self.current_token.value))
+        self.next()
+
+        # more name
+        while self.have("symbol", ","):
+            
+
+            #seperate trees
+                # self.next()
+                # if self.current_token.type != "identifier": raise ParseException("Expected token type to be an identifier")
+                # tree.addChild(ParseTree("keyword", static_or_field))
+                # tree.addChild(ParseTree(variable_token_type, variable_token_value))
+                # tree.addChild(ParseTree("identifier", self.current_token.value))
+                # self.next()
+
+            # , seperated
+            tree.addChild(ParseTree("symbol", ","))
+            self.next()
+            if self.current_token.type != "identifier": raise ParseException("Expected token type to be an identifier")
+            tree.addChild(ParseTree("identifier", self.current_token.value))
+            self.next()
+        
+
+        #;
+        if not self.have("symbol", ";"): return ParseException("Expected ;")
+        tree.addChild(ParseTree("symbol", ";"))
+
+        return tree
     
 
     def compileSubroutine(self):

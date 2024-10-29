@@ -1,4 +1,8 @@
 keyword class
 identifier Main
 symbol {
+keyword static
+keyword int
+identifier a
+symbol ;
 symbol }
