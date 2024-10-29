@@ -77,12 +77,14 @@ class CompilerParser :
         tree.addChild(ParseTree("symbol", "{"))
         self.next()
 
-        # class variables
+        
         while not self.have("symbol", "}"):
+            # class variables
             if self.current_token.getValue() in ["static" , "field"]:
                 tree.addChild(self.compileClassVarDec())
                 self.next()
 
+            # class subroutines
             elif self.current_token.getValue() in ["constructor" , "function", "method"]:
                 tree.addChild(self.compileSubroutine())
                 self.next()
@@ -93,7 +95,6 @@ class CompilerParser :
         # }
         if not self.have("symbol", "}"): raise ParseException("expected }")
         tree.addChild(ParseTree("symbol", "}"))
-        self.next()
 
         return tree
     
@@ -127,15 +128,6 @@ class CompilerParser :
         # more name
         while self.have("symbol", ","):
             
-
-            #seperate trees
-                # self.next()
-                # if self.current_token.getType() != "identifier": raise ParseException("Expected token type to be an identifier")
-                # tree.addChild(ParseTree("keyword", static_or_field))
-                # tree.addChild(ParseTree(variable_token_type, variable_token_value))
-                # tree.addChild(ParseTree("identifier", self.current_token.getValue()))
-                # self.next()
-
             # , seperated
             tree.addChild(ParseTree("symbol", ","))
             self.next()
@@ -156,7 +148,40 @@ class CompilerParser :
         Generates a parse tree for a method, function, or constructor
         @return a ParseTree that represents the method, function, or constructor
         """
-        return None 
+
+        tree = ParseTree("subroutine", "")
+        
+        # subroutine type
+        tree.addChild(ParseTree(self.current_token.getType(), self.current_token.getValue()))
+        self.next()
+
+        # return value type
+        if self.current_token.getType() != "identifier" and not (self.current_token.getType() == "keyword" and self.current_token.getValue() in ["int", "char", "boolean", "void"]): raise ParseException("Expected token type to be an int, char, boolean, void or identifier")
+        tree.addChild(ParseTree(self.current_token.getType(), self.current_token.getValue()))
+        self.next()
+
+        # subroutine name
+        if self.current_token.getType() != "identifier": raise ParseException("Expected identifier for subroutine name")
+        tree.addChild(ParseTree(self.current_token.getType(), self.current_token.getValue()))
+        self.next()
+
+        # params
+        # (
+        if not self.have("symbol", "("): raise ParseException("Expected (")
+        tree.addChild(ParseTree(self.current_token.getType(), self.current_token.getValue()))
+        self.next()
+
+        tree.addChild(self.compileParameterList())
+        
+
+        # (
+        if not self.have("symbol", ")"): raise ParseException("Expected )")
+        tree.addChild(ParseTree(self.current_token.getType(), self.current_token.getValue()))
+        self.next()
+
+        self.compileSubroutineBody()
+
+        return tree
     
     
     def compileParameterList(self):
@@ -164,7 +189,18 @@ class CompilerParser :
         Generates a parse tree for a subroutine's parameters
         @return a ParseTree that represents a subroutine's parameters
         """
-        return None 
+        tree = ParseTree("parameterList")
+        while not self.have("symbol", ")"):
+            if not self.is_valid_variable_type(): return ParseException("invalid type for parameter")
+            tree.addChild(ParseTree(self.current_token.getType(), self.current_token.getValue()))
+            self.next()
+
+            if not self.have("symbol", ","): continue
+
+            tree.addChild(ParseTree(self.current_token.getType(), self.current_token.getValue()))
+            self.next()
+
+        return tree
     
     
     def compileSubroutineBody(self):
@@ -172,7 +208,24 @@ class CompilerParser :
         Generates a parse tree for a subroutine's body
         @return a ParseTree that represents a subroutine's body
         """
-        return None 
+        tree = ParseTree("subroutineBody", "")
+        # {
+        if not self.have("symbol", "{"): return ParseException("Expected  {")
+        tree.addChild(ParseTree(self.current_token.getType(), self.current_token.getValue()))
+        self.next()
+
+        # variables decs
+        if self.have("keyword", "var"): tree.addChild(self.compileVarDec()); self.next()
+
+        # statements
+        if self.is_valid_statement(): tree.addChild(self.compileStatements()); self.next()
+
+        # }
+        if not self.have("symbol", "}"): return ParseException("Expected  }")
+        tree.addChild(ParseTree(self.current_token.getType(), self.current_token.getValue()))
+        self.next()
+
+        return tree 
     
     
     def compileVarDec(self):
@@ -180,7 +233,34 @@ class CompilerParser :
         Generates a parse tree for a variable declaration
         @return a ParseTree that represents a var declaration
         """
-        return None 
+        tree = ParseTree("varDec", "")
+        tree.addChild(ParseTree(self.current_token.getType(), self.current_token.getValue()))
+        self.next()
+
+        if not self.is_valid_variable_type(): raise ParseException("Invalid variable type")
+        tree.addChild(ParseTree(self.current_token.getType(), self.current_token.getValue()))
+        self.next()
+
+        #variable name
+        if self.current_token.getType() != "identifier": raise ParseException("Expected token type to be an identifier")
+        tree.addChild(ParseTree("identifier", self.current_token.getValue()))
+        self.next()
+
+        # more name
+        while self.have("symbol", ","):
+            
+            # , seperated
+            tree.addChild(ParseTree("symbol", ","))
+            self.next()
+            if self.current_token.getType() != "identifier": raise ParseException("Expected token type to be an identifier")
+            tree.addChild(ParseTree("identifier", self.current_token.getValue()))
+            self.next()
+
+        #;
+        if not self.have("symbol", ";"): return ParseException("Expected ;")
+        tree.addChild(ParseTree("symbol", ";"))
+
+        return tree 
     
 
     def compileStatements(self):
@@ -292,6 +372,14 @@ class CompilerParser :
 
         raise ParseException('current token doesn\'t match expected type and/or value')
     
+    def is_valid_return_type(self):
+        return self.current_token.getType() == "identifier"  or (self.current_token.getType() == "keyword" and self.current_token.getValue() in ["int", "char", "boolean", "void"])
+    
+    def is_valid_variable_type(self):
+        return self.current_token.getType() == "identifier"  or (self.current_token.getType() == "keyword" and self.current_token.getValue() in ["int", "char", "boolean"])
+                    
+    def is_valid_statement(self):
+        return self.current_token.getType() == "keyword" and self.current_token.getValue() in ["let", "if", "while", "do", "return"]
 
 if __name__ == "__main__":
 
