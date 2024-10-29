@@ -1,0 +1,4 @@
+keyword class
+identifier Main
+symbol {
+symbol }

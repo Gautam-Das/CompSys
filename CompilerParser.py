@@ -7,6 +7,9 @@ class CompilerParser :
         Constructor for the CompilerParser
         @param tokens A list of tokens to be parsed
         """
+        self.tokens = tokens
+        self.current_token = tokens[0]
+        self.tokens_index = 0
         pass
     
 
@@ -15,7 +18,41 @@ class CompilerParser :
         Generates a parse tree for a single program
         @return a ParseTree that represents the program
         """
-        return None 
+        # init tree if keyword is class
+        if not self.have("keyword", "class"): raise ParseException("the program doesn\'t begin with a class")
+        tree = ParseTree("class", "")
+        tree.addChild(ParseTree("keyword", "class"))
+        self.next()
+
+        # identifier
+        if not self.current_token.type == "identifier": raise ParseException("expected Identifier")
+        tree.addChild(ParseTree("identifier", self.current_token.value))
+        self.next()
+
+        # {
+        if not self.have("symbol", "{"): raise ParseException("expected {")
+        tree.addChild(ParseTree("symbol", "{"))
+        self.next()
+
+        # class variables
+        while not self.have("symbol", "}"):
+            if self.current_token.value in ["static" , "field"]:
+                tree.addChild(self.compileClassVarDec())
+                self.next()
+
+            elif self.current_token.value in ["constructor" , "function", "method"]:
+                tree.addChild(self.compileSubroutine())
+                self.next()
+            
+            else:
+                raise ParseException("current token is not a variable decleration or a subroutine")
+        
+        # }
+        if not self.have("symbol", "}"): raise ParseException("expected }")
+        tree.addChild(ParseTree("symbol", "}"))
+        self.next()
+
+        return tree
     
     
     def compileClass(self):
@@ -142,6 +179,9 @@ class CompilerParser :
         """
         Advance to the next token
         """
+        if self.tokens_index >= len(self.tokens) - 1: return 
+        self.tokens_index += 1
+        self.current_token =  self.tokens[self.tokens_index]
         return
 
 
@@ -150,7 +190,7 @@ class CompilerParser :
         Return the current token
         @return the token
         """
-        return None
+        return self.current_token
 
 
     def have(self,expectedType,expectedValue):
@@ -158,7 +198,8 @@ class CompilerParser :
         Check if the current token matches the expected type and value.
         @return True if a match, False otherwise
         """
-        return False
+
+        return (self.current_token.type == expectedType and self.current_token.value == expectedValue)
 
 
     def mustBe(self,expectedType,expectedValue):
@@ -167,7 +208,10 @@ class CompilerParser :
         If so, advance to the next token, returning the current token, otherwise throw/raise a ParseException.
         @return token that was current prior to advancing.
         """
-        return None
+        cur = self.current_token
+        if self.have(expectedType, expectedValue): self.next(); return cur
+
+        raise ParseException('current token doesn\'t match expected type and/or value')
     
 
 if __name__ == "__main__":
@@ -180,14 +224,16 @@ if __name__ == "__main__":
         }
     """
     tokens = []
-    tokens.append(Token("keyword","class"))
-    tokens.append(Token("identifier","MyClass"))
-    tokens.append(Token("symbol","{"))
-    tokens.append(Token("symbol","}"))
+
+    with open('tokens.txt') as f:
+        for l in f.readlines():
+            type, value = l.replace('\n','').split()
+            tokens.append(Token(type,value))
 
     parser = CompilerParser(tokens)
     try:
         result = parser.compileProgram()
         print(result)
-    except ParseException:
+    except ParseException as e:
         print("Error Parsing!")
+        print(str(e))
