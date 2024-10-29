@@ -19,14 +19,15 @@ class CompilerParser :
         @return a ParseTree that represents the program
         """
         # init tree if keyword is class
-        if not self.have("keyword", "class"): raise ParseException("the program doesn\'t begin with a class")
+        if not self.have("keyword", "class"): 
+            raise ParseException("the program doesnot begin with a class")
         tree = ParseTree("class", "")
         tree.addChild(ParseTree("keyword", "class"))
         self.next()
 
         # identifier
-        if not self.current_token.type == "identifier": raise ParseException("expected Identifier")
-        tree.addChild(ParseTree("identifier", self.current_token.value))
+        if not self.current_token.getType() == "identifier": raise ParseException("expected Identifier")
+        tree.addChild(ParseTree("identifier", self.current_token.getValue()))
         self.next()
 
         # {
@@ -36,11 +37,11 @@ class CompilerParser :
 
         # class variables
         while not self.have("symbol", "}"):
-            if self.current_token.value in ["static" , "field"]:
+            if self.current_token.getValue() in ["static" , "field"]:
                 tree.addChild(self.compileClassVarDec())
                 self.next()
 
-            elif self.current_token.value in ["constructor" , "function", "method"]:
+            elif self.current_token.getValue() in ["constructor" , "function", "method"]:
                 tree.addChild(self.compileSubroutine())
                 self.next()
             
@@ -67,8 +68,8 @@ class CompilerParser :
         self.next()
 
         # identifier
-        if not self.current_token.type == "identifier": raise ParseException("expected Identifier")
-        tree.addChild(ParseTree("identifier", self.current_token.value))
+        if not self.current_token.getType() == "identifier": raise ParseException("expected Identifier")
+        tree.addChild(ParseTree("identifier", self.current_token.getValue()))
         self.next()
 
         # {
@@ -78,11 +79,11 @@ class CompilerParser :
 
         # class variables
         while not self.have("symbol", "}"):
-            if self.current_token.value in ["static" , "field"]:
+            if self.current_token.getValue() in ["static" , "field"]:
                 tree.addChild(self.compileClassVarDec())
                 self.next()
 
-            elif self.current_token.value in ["constructor" , "function", "method"]:
+            elif self.current_token.getValue() in ["constructor" , "function", "method"]:
                 tree.addChild(self.compileSubroutine())
                 self.next()
             
@@ -106,21 +107,21 @@ class CompilerParser :
         tree = ParseTree("classVarDec","")
         if not (self.have("keyword", "static") or self.have("keyword", "field")): raise ParseException("expected keyword to be field or static")
     
-        # static_or_field = self.current_token.type
+        # static_or_field = self.current_token.getType()
 
-        tree.addChild(ParseTree(self.current_token.type, self.current_token.value))
+        tree.addChild(ParseTree(self.current_token.getType(), self.current_token.getValue()))
         self.next()
 
         # must be primitive or class data type
-        if self.current_token.type != "identifier" and not (self.current_token.type == "keyword" and self.current_token.value in ["int", "char", "boolean"]): raise ParseException("Expected token type to be an int, char, boolean or identifier")
-        # variable_token_type = self.current_token.type
-        # variable_token_value = self.current_token.value
-        tree.addChild(ParseTree(self.current_token.type, self.current_token.value))
+        if self.current_token.getType() != "identifier" and not (self.current_token.getType() == "keyword" and self.current_token.getValue() in ["int", "char", "boolean"]): raise ParseException("Expected token type to be an int, char, boolean or identifier")
+        # variable_token_type = self.current_token.getType()
+        # variable_token_value = self.current_token.getValue()
+        tree.addChild(ParseTree(self.current_token.getType(), self.current_token.getValue()))
         self.next()
         
         #variable name
-        if self.current_token.type != "identifier": raise ParseException("Expected token type to be an identifier")
-        tree.addChild(ParseTree("identifier", self.current_token.value))
+        if self.current_token.getType() != "identifier": raise ParseException("Expected token type to be an identifier")
+        tree.addChild(ParseTree("identifier", self.current_token.getValue()))
         self.next()
 
         # more name
@@ -129,17 +130,17 @@ class CompilerParser :
 
             #seperate trees
                 # self.next()
-                # if self.current_token.type != "identifier": raise ParseException("Expected token type to be an identifier")
+                # if self.current_token.getType() != "identifier": raise ParseException("Expected token type to be an identifier")
                 # tree.addChild(ParseTree("keyword", static_or_field))
                 # tree.addChild(ParseTree(variable_token_type, variable_token_value))
-                # tree.addChild(ParseTree("identifier", self.current_token.value))
+                # tree.addChild(ParseTree("identifier", self.current_token.getValue()))
                 # self.next()
 
             # , seperated
             tree.addChild(ParseTree("symbol", ","))
             self.next()
-            if self.current_token.type != "identifier": raise ParseException("Expected token type to be an identifier")
-            tree.addChild(ParseTree("identifier", self.current_token.value))
+            if self.current_token.getType() != "identifier": raise ParseException("Expected token type to be an identifier")
+            tree.addChild(ParseTree("identifier", self.current_token.getValue()))
             self.next()
         
 
@@ -271,14 +272,13 @@ class CompilerParser :
         """
         return self.current_token
 
-
     def have(self,expectedType,expectedValue):
         """
         Check if the current token matches the expected type and value.
         @return True if a match, False otherwise
         """
 
-        return (self.current_token.type == expectedType and self.current_token.value == expectedValue)
+        return (self.current_token.getType() == expectedType and self.current_token.getValue() == expectedValue)
 
 
     def mustBe(self,expectedType,expectedValue):
@@ -303,16 +303,14 @@ if __name__ == "__main__":
         }
     """
     tokens = []
-
-    with open('tokens.txt') as f:
-        for l in f.readlines():
-            type, value = l.replace('\n','').split()
-            tokens.append(Token(type,value))
+    tokens.append(Token("keyword","class"))
+    tokens.append(Token("identifier","MyClass"))
+    tokens.append(Token("symbol","{"))
+    tokens.append(Token("symbol","}"))
 
     parser = CompilerParser(tokens)
     try:
         result = parser.compileProgram()
         print(result)
-    except ParseException as e:
+    except ParseException:
         print("Error Parsing!")
-        print(str(e))

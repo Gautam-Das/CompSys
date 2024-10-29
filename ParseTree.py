@@ -3,8 +3,10 @@ class ParseException(Exception):
     Raised when tokens provided don't match the expected grammar
     Use this with `raise ParseException("My error message")`
     """
-    pass
-
+    def __init__(self, message):
+        self.message = message
+        super().__init__(self.message)
+        print(message)
 
 class ParseTree():
 
@@ -86,5 +88,11 @@ class Token(ParseTree):
     def __init__(self, type, value):
         self.type = type
         self.value = value
+
+    def getType(self):
+        return self.type
+
+    def getValue(self):
+        return self.value
 
     
