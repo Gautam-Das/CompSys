@@ -1,9 +1,0 @@
-push constant 1
-goto detour
-label test
-push constant 1
-add
-goto test
-
-label detour
-goto test

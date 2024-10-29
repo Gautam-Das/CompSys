@@ -1,4 +1,0 @@
-push constant 1
-goto skip
-push constant 2
-label skip
